@@ -79,8 +79,19 @@ cd reservation-de-ressources
 ```
 
 2. **Lancer l'application**
+**MacOS / Linux :**
 ```bash
 ./mvnw spring-boot:run
+```
+
+**Windows (CMD) :**
+```cmd
+mvnw.cmd spring-boot:run
+```
+
+**Windows (PowerShell) :**
+```powershell
+.\mvnw.cmd spring-boot:run
 ```
 
 3. **Accéder à l'application**
