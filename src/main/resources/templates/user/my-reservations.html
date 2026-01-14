@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Réservations</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{layout/header :: header}"></div>
+    
+    <main class="container my-4">
+        <!-- Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <!-- Titre -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="display-6">
+                <i class="fas fa-bookmark text-primary"></i> Mes Réservations
+            </h1>
+            <a th:href="@{/resources}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nouvelle réservation
+            </a>
+        </div>
+        
+        <!-- Liste des réservations -->
+        <div th:if="${reservations.isEmpty()}" class="text-center py-5">
+            <i class="fas fa-calendar-times fa-5x text-muted mb-4"></i>
+            <h3 class="text-muted">Aucune réservation</h3>
+            <p class="text-muted">Vous n'avez pas encore effectué de réservation.</p>
+            <a th:href="@{/resources}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Créer ma première réservation
+            </a>
+        </div>
+        
+        <div th:unless="${reservations.isEmpty()}">
+            <div class="row">
+                <div class="col-12" th:each="reservation : ${reservations}">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-door-open text-primary"></i>
+                                        <span th:text="${reservation.resourceName}">Nom de la ressource</span>
+                                    </h5>
+                                    <p class="card-text">
+                                        <i class="fas fa-calendar"></i>
+                                        <strong>Début :</strong> 
+                                        <span th:text="${#temporals.format(reservation.startTime, 'dd/MM/yyyy HH:mm')}">
+                                            01/01/2026 10:00
+                                        </span>
+                                        <br>
+                                        <i class="fas fa-calendar"></i>
+                                        <strong>Fin :</strong> 
+                                        <span th:text="${#temporals.format(reservation.endTime, 'dd/MM/yyyy HH:mm')}">
+                                            01/01/2026 12:00
+                                        </span>
+                                    </p>
+                                    <p class="card-text" th:if="${reservation.purpose}">
+                                        <i class="fas fa-info-circle"></i>
+                                        <strong>Objectif :</strong> <span th:text="${reservation.purpose}">Objectif</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <span th:if="${reservation.status.name() == 'PENDING'}" 
+                                          class="badge bg-warning mb-2">
+                                        <i class="fas fa-clock"></i> En attente
+                                    </span>
+                                    <span th:if="${reservation.status.name() == 'CONFIRMED'}" 
+                                          class="badge bg-success mb-2">
+                                        <i class="fas fa-check"></i> Confirmée
+                                    </span>
+                                    <span th:if="${reservation.status.name() == 'CANCELLED'}" 
+                                          class="badge bg-secondary mb-2">
+                                        <i class="fas fa-times"></i> Annulée
+                                    </span>
+                                    <span th:if="${reservation.status.name() == 'COMPLETED'}" 
+                                          class="badge bg-info mb-2">
+                                        <i class="fas fa-flag-checkered"></i> Terminée
+                                    </span>
+                                    
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            Créée le <span th:text="${#temporals.format(reservation.createdAt, 'dd/MM/yyyy')}">
+                                                01/01/2026
+                                            </span>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="~{layout/footer :: footer}"></div>
+    
+    <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</body>
+</html>

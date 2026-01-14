@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{layout/header :: header}"></div>
+    
+    <main class="container my-4">
+        <!-- Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <!-- Bienvenue -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-5">
+                    <i class="fas fa-home text-primary"></i> 
+                    Bienvenue, <span th:text="${currentUser?.firstName}">Utilisateur</span> !
+                </h1>
+                <p class="lead text-muted">
+                    <i class="fas fa-user-tag"></i> 
+                    Rôle : <span class="badge bg-primary" th:text="${currentUser?.role}">USER</span>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Statistiques -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-center border-primary">
+                    <div class="card-body">
+                        <i class="fas fa-calendar-check fa-3x text-primary mb-3"></i>
+                        <h3 class="card-title" th:text="${totalReservations}">0</h3>
+                        <p class="card-text text-muted">Réservations totales</p>
+                        <a th:href="@{/my-reservations}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-arrow-right"></i> Voir tout
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card text-center border-success">
+                    <div class="card-body">
+                        <i class="fas fa-door-open fa-3x text-success mb-3"></i>
+                        <h3 class="card-title">Ressources</h3>
+                        <p class="card-text text-muted">Parcourir les ressources</p>
+                        <a th:href="@{/resources}" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-arrow-right"></i> Explorer
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card text-center border-info">
+                    <div class="card-body">
+                        <i class="fas fa-user-circle fa-3x text-info mb-3"></i>
+                        <h3 class="card-title">Profil</h3>
+                        <p class="card-text text-muted">Gérer mon profil</p>
+                        <a th:href="@{/profile}" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-arrow-right"></i> Accéder
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Réservations à venir -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock"></i> Prochaines Réservations
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${upcomingReservations.isEmpty()}" class="text-center py-5 text-muted">
+                            <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                            <p>Aucune réservation à venir</p>
+                            <a th:href="@{/resources}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Créer une réservation
+                            </a>
+                        </div>
+                        
+                        <div th:unless="${upcomingReservations.isEmpty()}" class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Ressource</th>
+                                        <th>Début</th>
+                                        <th>Fin</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="reservation : ${upcomingReservations}">
+                                        <td>
+                                            <i class="fas fa-door-open text-primary"></i>
+                                            <span th:text="${reservation.resourceName}">Ressource</span>
+                                        </td>
+                                        <td th:text="${#temporals.format(reservation.startTime, 'dd/MM/yyyy HH:mm')}">
+                                            01/01/2026 10:00
+                                        </td>
+                                        <td th:text="${#temporals.format(reservation.endTime, 'dd/MM/yyyy HH:mm')}">
+                                            01/01/2026 12:00
+                                        </td>
+                                        <td>
+                                            <span th:if="${reservation.status.name() == 'PENDING'}" 
+                                                  class="badge bg-warning">En attente</span>
+                                            <span th:if="${reservation.status.name() == 'CONFIRMED'}" 
+                                                  class="badge bg-success">Confirmée</span>
+                                            <span th:if="${reservation.status.name() == 'CANCELLED'}" 
+                                                  class="badge bg-secondary">Annulée</span>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{/my-reservations}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> Voir
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="~{layout/footer :: footer}"></div>
+    
+    <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</body>
+</html>

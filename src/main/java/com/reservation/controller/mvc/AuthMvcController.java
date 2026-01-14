@@ -5,8 +5,6 @@ import com.reservation.entity.User;
 import com.reservation.exception.UserAlreadyExistsException;
 import com.reservation.service.AuthService;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,8 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AuthMvcController {
-    
-    private static final Logger logger = LoggerFactory.getLogger(AuthMvcController.class);
     
     private final AuthService authService;
     
@@ -69,7 +65,6 @@ public class AuthMvcController {
             RedirectAttributes redirectAttributes,
             Model model
     ) {
-        logger.info("Tentative d'inscription pour: {}", registerRequest.getUsername());
         
         // Vérifier les erreurs de validation
         if (bindingResult.hasErrors()) {
@@ -79,19 +74,16 @@ public class AuthMvcController {
         
         try {
             User user = authService.register(registerRequest);
-            logger.info("Inscription réussie pour: {}", user.getUsername());
             
             redirectAttributes.addFlashAttribute("successMessage", 
                 "Inscription réussie ! Vous pouvez maintenant vous connecter.");
             return "redirect:/login";
             
         } catch (UserAlreadyExistsException e) {
-            logger.error("Erreur d'inscription: {}", e.getMessage());
             model.addAttribute("pageTitle", "Inscription");
             model.addAttribute("errorMessage", e.getMessage());
             return "auth/register";
         } catch (Exception e) {
-            logger.error("Erreur inattendue lors de l'inscription", e);
             model.addAttribute("pageTitle", "Inscription");
             model.addAttribute("errorMessage", "Erreur lors de l'inscription. Veuillez réessayer.");
             return "auth/register";

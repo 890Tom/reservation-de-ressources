@@ -8,6 +8,7 @@ import com.reservation.security.service.UserDetailsServiceImpl;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -61,44 +62,68 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter(jwtUtils, userDetailsService);
     }
 
+    /**
+     * 1. CONFIGURATION API (JWT)
+     * Priorité Order(1)
+     */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(Customizer.withDefaults()) // Active CORS avec les réglages par défaut
+            .securityMatcher("/api/**")
+            .csrf(AbstractHttpConfigurer::disable) // Désactivé pour le stateless
+            .cors(Customizer.withDefaults())
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/test/public", "/api/test/public/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/test/public/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        
+        return http.build();
+    }
+
+    /**
+     * 2. CONFIGURATION WEB (THYMELEAF / SESSION)
+     * Priorité Order(2)
+     */
+    @Bean
+    @Order(2)
+    public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(Customizer.withDefaults()) // ACTIVÉ pour MVC (Protection contre attaques CSRF)
+            .authorizeHttpRequests(auth -> auth
+                // Ressources statiques et pages publiques
+                .requestMatchers("/", "/login", "/register", "/error").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/error").permitAll()
-                // Pages MVC publiques
-                .requestMatchers("/", "/login", "/register", "/webjars/**", "/css/**", "/js/**").permitAll()
                 
-                // Pages MVC authentifiées
-                .requestMatchers("/dashboard", "/profile", "/my-reservations", "/resources/**", "/reservations/**").authenticated()
-                
-                // Pages ADMIN/MANAGER
-                .requestMatchers("/admin/**").hasAnyRole("MANAGER", "ADMIN")
+                // Pages privées
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
+                .loginPage("/login") // Ton contrôleur GET /login
+                .loginProcessingUrl("/login") // Géré par Spring Security
                 .defaultSuccessUrl("/dashboard", true)
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutUrl("/logout")
+                .logoutUrl("/logout") // Sécurisé par POST + CSRF
                 .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
                 .permitAll()
             )
-            .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-            // Bean de filtre
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Session standard
+            )
+            .headers(headers -> headers
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin) // Pour la console H2
+            );
+        
         return http.build();
     }
 }
