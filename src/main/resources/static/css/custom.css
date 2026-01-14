@@ -1,0 +1,64 @@
+/* Style global */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+/* Cards */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Badges de statut */
+.badge-available {
+    background-color: #28a745;
+}
+
+.badge-maintenance {
+    background-color: #ffc107;
+}
+
+.badge-unavailable {
+    background-color: #dc3545;
+}
+
+.badge-pending {
+    background-color: #ffc107;
+}
+
+.badge-confirmed {
+    background-color: #28a745;
+}
+
+.badge-cancelled {
+    background-color: #6c757d;
+}
+
+/* Calendrier */
+.calendar-event {
+    padding: 5px;
+    margin: 2px 0;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.event-pending {
+    background-color: #fff3cd;
+    border-left: 3px solid #ffc107;
+}
+
+.event-confirmed {
+    background-color: #d4edda;
+    border-left: 3px solid #28a745;
+}

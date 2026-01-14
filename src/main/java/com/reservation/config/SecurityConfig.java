@@ -73,10 +73,30 @@ public class SecurityConfig {
                 .requestMatchers("/api/test/public", "/api/test/public/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/error").permitAll()
+                // Pages MVC publiques
+                .requestMatchers("/", "/login", "/register", "/webjars/**", "/css/**", "/js/**").permitAll()
+                
+                // Pages MVC authentifiées
+                .requestMatchers("/dashboard", "/profile", "/my-reservations", "/resources/**", "/reservations/**").authenticated()
+                
+                // Pages ADMIN/MANAGER
+                .requestMatchers("/admin/**").hasAnyRole("MANAGER", "ADMIN")
                 .anyRequest().authenticated()
             )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/dashboard", true)
+                .failureUrl("/login?error=true")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .permitAll()
+            )
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-            // Bean de filtre ici
+            // Bean de filtre
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

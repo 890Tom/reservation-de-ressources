@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <footer th:fragment="footer" class="bg-light text-center text-lg-start mt-auto">
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Système de Réservation</h5>
+                    <p>
+                        Plateforme de gestion de réservations de ressources (salles, équipements, véhicules).
+                    </p>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Liens utiles</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li><a th:href="@{/}" class="text-dark">Accueil</a></li>
+                        <li><a th:href="@{/resources}" class="text-dark">Ressources</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-envelope"></i> contact@reservation.com</li>
+                        <li><i class="fas fa-phone"></i> +261 XX XX XXX XX</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center p-3 bg-dark text-white">
+            © 2026 Système de Réservation - Tous droits réservés
+        </div>
+    </footer>
+</body>
+</html>
