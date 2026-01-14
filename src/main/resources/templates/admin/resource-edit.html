@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier une Ressource</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{layout/header :: header}"></div>
+    
+    <main class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h4 class="mb-0">
+                            <i class="fas fa-edit"></i> Modifier la Ressource
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Messages -->
+                        <div th:if="${errorMessage}" class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i> <span th:text="${errorMessage}"></span>
+                        </div>
+                        
+                        <form th:action="@{/admin/resources/{id}/edit(id=${resource.id})}" 
+                              th:object="${updateResourceRequest}" 
+                              method="post">
+                            
+                            <div class="mb-3">
+                                <label for="name" class="form-label">
+                                    <i class="fas fa-tag"></i> Nom de la ressource
+                                </label>
+                                <input type="text" class="form-control" id="name" 
+                                       th:field="*{name}"
+                                       th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" 
+                                     th:errors="*{name}"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">
+                                    <i class="fas fa-info-circle"></i> Description
+                                </label>
+                                <textarea class="form-control" id="description" 
+                                          th:field="*{description}"
+                                          rows="3"></textarea>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="type" class="form-label">
+                                        <i class="fas fa-list"></i> Type
+                                    </label>
+                                    <select class="form-select" id="type" th:field="*{type}">
+                                        <option th:each="type : ${resourceTypes}" 
+                                                th:value="${type}" 
+                                                th:text="${type}">Type</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="status" class="form-label">
+                                        <i class="fas fa-check-circle"></i> Statut
+                                    </label>
+                                    <select class="form-select" id="status" th:field="*{status}">
+                                        <option th:each="status : ${resourceStatuses}" 
+                                                th:value="${status}" 
+                                                th:text="${status}">Statut</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    <label for="location" class="form-label">
+                                        <i class="fas fa-map-marker-alt"></i> Localisation
+                                    </label>
+                                    <input type="text" class="form-control" id="location" 
+                                           th:field="*{location}">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="capacity" class="form-label">
+                                        <i class="fas fa-users"></i> Capacité
+                                    </label>
+                                    <input type="number" class="form-control" id="capacity" 
+                                           th:field="*{capacity}" min="1">
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <small>Créée le <span th:text="${#temporals.format(resource.createdAt, 'dd/MM/yyyy HH:mm')}"></span></small>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    <i class="fas fa-save"></i> Enregistrer les modifications
+                                </button>
+                                <a th:href="@{/admin/resources}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left"></i> Annuler
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="~{layout/footer :: footer}"></div>
+    
+    <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</body>
+</html>

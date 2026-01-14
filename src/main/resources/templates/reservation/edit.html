@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier la réservation</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{layout/header :: header}"></div>
+    
+    <main class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h4 class="mb-0">
+                            <i class="fas fa-edit"></i> Modifier la réservation
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Info ressource -->
+                        <div class="alert alert-info">
+                            <h5><i class="fas fa-door-open"></i> <span th:text="${resource.name}">Ressource</span></h5>
+                            <p class="mb-0">
+                                <i class="fas fa-map-marker-alt"></i> <span th:text="${resource.location}">Lieu</span>
+                            </p>
+                        </div>
+                        
+                        <!-- Messages -->
+                        <div th:if="${errorMessage}" class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i> <span th:text="${errorMessage}"></span>
+                        </div>
+                        
+                        <!-- Formulaire -->
+                        <form th:action="@{/reservations/{id}/edit(id=${reservation.id})}" 
+                              th:object="${updateReservationRequest}" 
+                              method="post">
+                            
+                            <div class="mb-3">
+                                <label for="startTime" class="form-label">
+                                    <i class="fas fa-calendar"></i> Date et heure de début *
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control" 
+                                       id="startTime" 
+                                       th:field="*{startTime}"
+                                       th:value="*{startTime}"
+                                       th:classappend="${#fields.hasErrors('startTime')} ? 'is-invalid'"
+                                       required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('startTime')}" 
+                                     th:errors="*{startTime}"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="endTime" class="form-label">
+                                    <i class="fas fa-calendar"></i> Date et heure de fin *
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control" 
+                                       id="endTime" 
+                                       th:field="*{endTime}"
+                                       th:classappend="${#fields.hasErrors('endTime')} ? 'is-invalid'"
+                                       required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('endTime')}" 
+                                     th:errors="*{endTime}"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="purpose" class="form-label">
+                                    <i class="fas fa-comment"></i> Objectif de la réservation
+                                </label>
+                                <textarea class="form-control" 
+                                          id="purpose" 
+                                          th:field="*{purpose}"
+                                          rows="3"></textarea>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Rappel des règles :</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>Durée : minimum 30 minutes, maximum 8 heures</li>
+                                    <li>Anticipation : maximum 30 jours à l'avance</li>
+                                    <li>La ressource ne doit pas être réservée sur ce créneau</li>
+                                </ul>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    <i class="fas fa-save"></i> Enregistrer les modifications
+                                </button>
+                                <a th:href="@{/my-reservations}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left"></i> Annuler
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="~{layout/footer :: footer}"></div>
+    
+    <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</body>
+</html>

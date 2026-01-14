@@ -100,7 +100,7 @@ public class SecurityConfig {
                 .requestMatchers("/h2-console/**").permitAll()
                 
                 // Pages privées
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasAnyRole("MANAGER","ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

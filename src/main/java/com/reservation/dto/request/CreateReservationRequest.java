@@ -13,15 +13,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CreateReservationRequest {
     
-    @NotNull(message = "L'ID de la ressource est obligatoire")
     private Long resourceId;
     
     @NotNull(message = "La date de début est obligatoire")
-    @Future(message = "La date de début doit être dans le futur")
     private LocalDateTime startTime;
     
     @NotNull(message = "La date de fin est obligatoire")
-    @Future(message = "La date de fin doit être dans le futur")
     private LocalDateTime endTime;
     
     private String purpose;

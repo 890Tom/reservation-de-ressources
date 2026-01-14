@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${resource?.name}">Détail de la ressource</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{layout/header :: header}"></div>
+    
+    <main class="container my-4">
+        <!-- Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <!-- Bouton retour -->
+        <div class="mb-3">
+            <a th:href="@{/resources}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+        
+        <div class="row">
+            <!-- Informations de la ressource -->
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Icône -->
+                        <div class="text-center mb-4">
+                            <i th:if="${resource.type.name() == 'MEETING_ROOM'}" 
+                               class="fas fa-door-open fa-5x text-primary"></i>
+                            <i th:if="${resource.type.name() == 'EQUIPMENT'}" 
+                               class="fas fa-laptop fa-5x text-success"></i>
+                            <i th:if="${resource.type.name() == 'VEHICLE'}" 
+                               class="fas fa-car fa-5x text-info"></i>
+                        </div>
+                        
+                        <h2 class="text-center mb-3" th:text="${resource.name}">Nom de la ressource</h2>
+                        
+                        <div class="text-center mb-4">
+                            <span th:if="${resource.status.name() == 'AVAILABLE'}" 
+                                  class="badge bg-success fs-6">
+                                <i class="fas fa-check"></i> Disponible
+                            </span>
+                            <span th:if="${resource.status.name() == 'MAINTENANCE'}" 
+                                  class="badge bg-warning fs-6">
+                                <i class="fas fa-wrench"></i> En maintenance
+                            </span>
+                            <span th:if="${resource.status.name() == 'UNAVAILABLE'}" 
+                                  class="badge bg-danger fs-6">
+                                <i class="fas fa-times"></i> Indisponible
+                            </span>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5>Informations</h5>
+                        
+                        <p th:if="${resource.description}" class="text-muted">
+                            <i class="fas fa-info-circle"></i> <span th:text="${resource.description}">Description</span>
+                        </p>
+                        
+                        <p>
+                            <i class="fas fa-tag"></i> 
+                            <strong>Type:</strong> <span th:text="${resource.type}">Type</span>
+                        </p>
+                        
+                        <p th:if="${resource.location}">
+                            <i class="fas fa-map-marker-alt"></i> 
+                            <strong>Lieu:</strong> <span th:text="${resource.location}">Lieu</span>
+                        </p>
+                        
+                        <p th:if="${resource.capacity}">
+                            <i class="fas fa-users"></i> 
+                            <strong>Capacité:</strong> <span th:text="${resource.capacity}">0</span> personnes
+                        </p>
+                        
+                        <hr>
+                        
+                        <p class="small text-muted mb-0">
+                            <i class="fas fa-calendar"></i> 
+                            Créée le <span th:text="${#temporals.format(resource.createdAt, 'dd/MM/yyyy')}">01/01/2026</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulaire de réservation -->
+            <div class="col-md-7">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-plus"></i> Réserver cette ressource
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/resources/{id}/reserve(id=${resource.id})}" 
+                              th:object="${createReservationRequest}" 
+                              method="post">
+                            
+                            <div class="mb-3">
+                                <label for="startTime" class="form-label">
+                                    <i class="fas fa-calendar"></i> Date et heure de début *
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control" 
+                                       id="startTime" 
+                                       th:field="*{startTime}"
+                                       th:classappend="${#fields.hasErrors('startTime')} ? 'is-invalid'"
+                                       required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('startTime')}" 
+                                     th:errors="*{startTime}"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="endTime" class="form-label">
+                                    <i class="fas fa-calendar"></i> Date et heure de fin *
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control" 
+                                       id="endTime" 
+                                       th:field="*{endTime}"
+                                       th:classappend="${#fields.hasErrors('endTime')} ? 'is-invalid'"
+                                       required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('endTime')}" 
+                                     th:errors="*{endTime}"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="purpose" class="form-label">
+                                    <i class="fas fa-comment"></i> Objectif de la réservation
+                                </label>
+                                <textarea class="form-control" 
+                                          id="purpose" 
+                                          th:field="*{purpose}"
+                                          rows="3" 
+                                          placeholder="Ex: Réunion d'équipe, présentation client..."></textarea>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Règles de réservation :</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>Durée : minimum 30 minutes, maximum 8 heures</li>
+                                    <li>Anticipation : maximum 30 jours à l'avance</li>
+                                    <li>Annulation : possible jusqu'à 2 heures avant le début</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-check"></i> Réserver maintenant
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Calendrier des réservations -->
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-alt"></i> Réservations existantes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${reservations.isEmpty()}" class="text-center text-muted py-3">
+                            <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                            <p class="mb-0">Aucune réservation pour cette ressource</p>
+                        </div>
+                        
+                        <div th:unless="${reservations.isEmpty()}">
+                            <div class="mb-2" th:each="reservation : ${reservations}">
+                                <div class="card" 
+                                     th:classappend="${reservation.status.name() == 'CONFIRMED'} ? 'border-success' : 'border-warning'">
+                                    <div class="card-body py-2">
+                                        <div class="row align-items-center">
+                                            <div class="col-8">
+                                                <small>
+                                                    <i class="fas fa-calendar"></i>
+                                                    <span th:text="${#temporals.format(reservation.startTime, 'dd/MM/yyyy HH:mm')}">
+                                                        01/01/2026 10:00
+                                                    </span>
+                                                    →
+                                                    <span th:text="${#temporals.format(reservation.endTime, 'HH:mm')}">12:00</span>
+                                                </small>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user"></i> <span th:text="${reservation.username}">User</span>
+                                                </small>
+                                            </div>
+                                            <div class="col-4 text-end">
+                                                <span th:if="${reservation.status.name() == 'PENDING'}" 
+                                                      class="badge bg-warning">Attente</span>
+                                                <span th:if="${reservation.status.name() == 'CONFIRMED'}" 
+                                                      class="badge bg-success">Confirmée</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="~{layout/footer :: footer}"></div>
+    
+    <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</body>
+</html>

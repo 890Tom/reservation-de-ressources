@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des Réservations</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{layout/header :: header}"></div>
+    
+    <main class="container my-4">
+        <!-- Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <!-- Titre -->
+        <h1 class="display-6 mb-4">
+            <i class="fas fa-calendar-alt text-primary"></i> Gestion des Réservations
+        </h1>
+        
+        <!-- Tableau des réservations -->
+        <div class="card">
+            <div class="card-body">
+                <div th:if="${reservations.isEmpty()}" class="text-center py-5 text-muted">
+                    <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                    <p>Aucune réservation</p>
+                </div>
+                
+                <div th:unless="${reservations.isEmpty()}" class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Utilisateur</th>
+                                <th>Ressource</th>
+                                <th>Début</th>
+                                <th>Fin</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="reservation : ${reservations.content}">
+                                <td th:text="${reservation.id}">1</td>
+                                <td>
+                                    <i class="fas fa-user"></i>
+                                    <span th:text="${reservation.username}">User</span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-door-open text-primary"></i>
+                                    <span th:text="${reservation.resourceName}">Ressource</span>
+                                </td>
+                                <td th:text="${#temporals.format(reservation.startTime, 'dd/MM/yyyy HH:mm')}">
+                                    01/01/2026 10:00
+                                </td>
+                                <td th:text="${#temporals.format(reservation.endTime, 'dd/MM/yyyy HH:mm')}">
+                                    01/01/2026 12:00
+                                </td>
+                                <td>
+                                    <span th:if="${reservation.status.name() == 'PENDING'}" 
+                                          class="badge bg-warning">
+                                        <i class="fas fa-clock"></i> En attente
+                                    </span>
+                                    <span th:if="${reservation.status.name() == 'CONFIRMED'}" 
+                                          class="badge bg-success">
+                                        <i class="fas fa-check"></i> Confirmée
+                                    </span>
+                                    <span th:if="${reservation.status.name() == 'CANCELLED'}" 
+                                          class="badge bg-secondary">
+                                        <i class="fas fa-times"></i> Annulée
+                                    </span>
+                                    <span th:if="${reservation.status.name() == 'COMPLETED'}" 
+                                          class="badge bg-info">
+                                        <i class="fas fa-flag-checkered"></i> Terminée
+                                    </span>
+                                </td>
+                                <td>
+                                    <!-- Bouton Confirmer (seulement si PENDING) -->
+                                    <form th:if="${reservation.status.name() == 'PENDING'}"
+                                          th:action="@{/admin/reservations/{id}/confirm(id=${reservation.id})}" 
+                                          method="post"
+                                          sec:authorize="hasRole('MANAGER')"
+                                          style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-success" title="Confirmer">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+
+                                    <a th:if="${reservation.status.name() == 'PENDING'}" 
+                                        th:href="@{/reservations/{id}/edit(id=${reservation.id})}" 
+                                        class="btn btn-sm btn-warning"
+                                        sec:authorize="hasRole('MANAGER')">
+                                        <i class="fas fa-edit"></i> Modifier
+                                    </a>
+                                    
+                                    <!-- Bouton Annuler (seulement si PENDING ou CONFIRMED) -->
+                                    <form th:if="${reservation.status.name() == 'PENDING' or reservation.status.name() == 'CONFIRMED'}"
+                                          th:action="@{/admin/reservations/{id}/cancel(id=${reservation.id})}" 
+                                          method="post" 
+                                          style="display:inline;"
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?');">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Annuler">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <nav th:if="${totalPages > 1}">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/reservations(page=${currentPage - 1})}">Précédent</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" th:href="@{/admin/reservations(page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/reservations(page=${currentPage + 1})}">Suivant</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="~{layout/footer :: footer}"></div>
+    
+    <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</body>
+</html>

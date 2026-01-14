@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ressources</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{layout/header :: header}"></div>
+    
+    <main class="container my-4">
+        <!-- Messages -->
+        <div th:if="${param.error}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:if="${param.error[0] == 'notfound'}">Ressource non trouvée.</span>
+            <span th:if="${param.error[0] == 'general'}">Une erreur s'est produite.</span>
+        </div>
+        
+        <!-- Titre et filtres -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-6">
+                    <i class="fas fa-door-open text-primary"></i> Ressources disponibles
+                </h1>
+            </div>
+        </div>
+        
+        <!-- Filtres -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form th:action="@{/resources}" method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="type" class="form-label">
+                            <i class="fas fa-filter"></i> Type de ressource
+                        </label>
+                        <select class="form-select" id="type" name="type">
+                            <option value="">Tous les types</option>
+                            <option th:each="resourceType : ${resourceTypes}" 
+                                    th:value="${resourceType}" 
+                                    th:text="${resourceType}"
+                                    th:selected="${resourceType == selectedType}">
+                                Type
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">
+                            <i class="fas fa-info-circle"></i> Statut
+                        </label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">Tous les statuts</option>
+                            <option th:each="resourceStatus : ${resourceStatuses}" 
+                                    th:value="${resourceStatus}" 
+                                    th:text="${resourceStatus}"
+                                    th:selected="${resourceStatus == selectedStatus}">
+                                Statut
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-search"></i> Filtrer
+                        </button>
+                        <a th:href="@{/resources}" class="btn btn-outline-secondary">
+                            <i class="fas fa-redo"></i> Réinitialiser
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Liste des ressources -->
+        <div th:if="${resources.isEmpty()}" class="text-center py-5">
+            <i class="fas fa-inbox fa-5x text-muted mb-4"></i>
+            <h3 class="text-muted">Aucune ressource trouvée</h3>
+            <p class="text-muted">Essayez de modifier vos filtres.</p>
+        </div>
+        
+        <div th:unless="${resources.isEmpty()}">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col" th:each="resource : ${resources.content}">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <!-- Icône selon le type -->
+                            <div class="text-center mb-3">
+                                <i th:if="${resource.type.name() == 'MEETING_ROOM'}" 
+                                   class="fas fa-door-open fa-3x text-primary"></i>
+                                <i th:if="${resource.type.name() == 'EQUIPMENT'}" 
+                                   class="fas fa-laptop fa-3x text-success"></i>
+                                <i th:if="${resource.type.name() == 'VEHICLE'}" 
+                                   class="fas fa-car fa-3x text-info"></i>
+                            </div>
+                            
+                            <h5 class="card-title text-center" th:text="${resource.name}">
+                                Nom de la ressource
+                            </h5>
+                            
+                            <p class="card-text text-muted small text-center" 
+                               th:text="${resource.description}">
+                                Description
+                            </p>
+                            
+                            <hr>
+                            
+                            <div class="mb-2">
+                                <small>
+                                    <i class="fas fa-tag"></i> 
+                                    <strong>Type:</strong> <span th:text="${resource.type}">Type</span>
+                                </small>
+                            </div>
+                            
+                            <div class="mb-2" th:if="${resource.location}">
+                                <small>
+                                    <i class="fas fa-map-marker-alt"></i> 
+                                    <strong>Lieu:</strong> <span th:text="${resource.location}">Lieu</span>
+                                </small>
+                            </div>
+                            
+                            <div class="mb-2" th:if="${resource.capacity}">
+                                <small>
+                                    <i class="fas fa-users"></i> 
+                                    <strong>Capacité:</strong> <span th:text="${resource.capacity}">0</span> personnes
+                                </small>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <span th:if="${resource.status.name() == 'AVAILABLE'}" 
+                                      class="badge bg-success">
+                                    <i class="fas fa-check"></i> Disponible
+                                </span>
+                                <span th:if="${resource.status.name() == 'MAINTENANCE'}" 
+                                      class="badge bg-warning">
+                                    <i class="fas fa-wrench"></i> Maintenance
+                                </span>
+                                <span th:if="${resource.status.name() == 'UNAVAILABLE'}" 
+                                      class="badge bg-danger">
+                                    <i class="fas fa-times"></i> Indisponible
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer text-center">
+                            <a th:href="@{/resources/{id}(id=${resource.id})}" 
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> Voir détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            <nav th:if="${totalPages > 1}" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" 
+                           th:href="@{/resources(page=${currentPage - 1}, type=${selectedType}, status=${selectedStatus})}">
+                            Précédent
+                        </a>
+                    </li>
+                    
+                    <li class="page-item" 
+                        th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" 
+                           th:href="@{/resources(page=${i}, type=${selectedType}, status=${selectedStatus})}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+                    
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" 
+                           th:href="@{/resources(page=${currentPage + 1}, type=${selectedType}, status=${selectedStatus})}">
+                            Suivant
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="~{layout/footer :: footer}"></div>
+    
+    <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/custom.js}"></script>
+</body>
+</html>
