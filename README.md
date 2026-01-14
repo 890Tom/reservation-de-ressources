@@ -53,7 +53,7 @@ Ce projet est à usage éducatif.
 -  Supprimer une ressource (ADMIN uniquement)
 -  Vérifier la disponibilité d'une ressource sur un créneau
 
-### 📅 Gestion des Réservations
+### Gestion des Réservations
 -  Créer une réservation avec validation des conflits
 -  Lister ses réservations
 -  Consulter les réservations d'une ressource (calendrier)
@@ -64,7 +64,7 @@ Ce projet est à usage éducatif.
 
 ---
 
-## 🚀 Installation et démarrage
+## Installation et démarrage
 
 ### Prérequis
 - Java 21+
@@ -93,7 +93,7 @@ cd reservation-de-ressources
 
 ---
 
-## 👤 Comptes de test
+## Comptes de test
 
 Des comptes sont automatiquement créés au démarrage :
 
@@ -106,7 +106,7 @@ Des comptes sont automatiquement créés au démarrage :
 
 ---
 
-## 🏗 Architecture
+## Architecture
 ```
 src/main/
 ├── java/com/reservation/
@@ -139,7 +139,7 @@ src/main/
 
 ---
 
-## 🔌 Endpoints API
+## Endpoints API
 
 ### Authentification
 ```
