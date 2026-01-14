@@ -148,7 +148,7 @@ public class DataInitializer {
                 camera.setName("Caméra Logitech 4K");
                 camera.setDescription("Caméra pour visioconférences");
                 camera.setType(ResourceType.EQUIPMENT);
-                camera.setStatus(ResourceStatus.MAINTENANCE);
+                camera.setStatus(ResourceStatus.AVAILABLE);
                 camera.setLocation("Bureau IT");
                 camera.setCapacity(1);
                 resourceRepository.save(camera);
@@ -176,10 +176,40 @@ public class DataInitializer {
                 camionnette.setName("Ford Transit");
                 camionnette.setDescription("Camionnette pour transport de matériel");
                 camionnette.setType(ResourceType.VEHICLE);
-                camionnette.setStatus(ResourceStatus.UNAVAILABLE);
+                camionnette.setStatus(ResourceStatus.AVAILABLE);
                 camionnette.setLocation("Parking C");
                 camionnette.setCapacity(3);
                 resourceRepository.save(camionnette);
+
+                // SALLE SUPPLÉMENTAIRE
+                Resource salle4 = new Resource();
+                salle4.setName("Salle de Formation");
+                salle4.setDescription("Salle équipée pour formations et ateliers");
+                salle4.setType(ResourceType.MEETING_ROOM);
+                salle4.setStatus(ResourceStatus.AVAILABLE);
+                salle4.setLocation("Bâtiment C - Étage 1");
+                salle4.setCapacity(25);
+                resourceRepository.save(salle4);
+
+                // ÉQUIPEMENT SUPPLÉMENTAIRE
+                Resource imprimante = new Resource();
+                imprimante.setName("Imprimante HP LaserJet");
+                imprimante.setDescription("Imprimante réseau noir et blanc");
+                imprimante.setType(ResourceType.EQUIPMENT);
+                imprimante.setStatus(ResourceStatus.AVAILABLE);
+                imprimante.setLocation("Open Space - Bâtiment A");
+                imprimante.setCapacity(1);
+                resourceRepository.save(imprimante);
+
+                // VÉHICULE SUPPLÉMENTAIRE
+                Resource moto = new Resource();
+                moto.setName("Yamaha MT-07");
+                moto.setDescription("Moto pour déplacements rapides en ville");
+                moto.setType(ResourceType.VEHICLE);
+                moto.setStatus(ResourceStatus.AVAILABLE);
+                moto.setLocation("Parking A - Place Moto");
+                moto.setCapacity(2);
+                resourceRepository.save(moto);
                 
                 logger.info("{} ressources créées", resourceRepository.count());
             } else {
@@ -196,10 +226,6 @@ public class DataInitializer {
             logger.info("   USER     : user     / user123");
             logger.info("   USER     : john     / john123");
             logger.info("");
-            logger.info(" Endpoints disponibles :");
-            logger.info("   POST http://localhost:8080/api/auth/login");
-            logger.info("   POST http://localhost:8080/api/auth/register");
-            logger.info("========================================");
         };
     }
 }
