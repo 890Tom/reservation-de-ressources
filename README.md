@@ -4,15 +4,33 @@ Application web de gestion de réservations de ressources (salles de réunion, �
 
 ---
 
-## Auteur
+## Cadre du test et recommandations
 
-Développé dans le cadre d'un test technique.
+Ce projet a été réalisé dans le cadre d’un **test technique de recrutement**, avec un **temps imparti d’une journée**.
 
----
+### Périmètre
+- Le périmètre fonctionnel a été **délibérément restreint**, compte tenu du temps imparti (1 journée), afin de privilégier :
+  - la qualité et la lisibilité du code,
+  - une architecture claire et cohérente,
+  - le respect des bonnes pratiques Java/Spring,
+  - une utilisation structurée de Git (branches de fonctionnalités, commits atomiques, merge sur `main`).
 
-## Licence
+Certaines fonctionnalités avancées (optimisations, couverture de tests étendue, gestion fine des cas limites, durcissement sécurité) pourraient être approfondies dans un contexte projet réel disposant de plus de temps.
 
-Ce projet est à usage éducatif.
+### Usage du projet
+Ce dépôt est fourni :
+- à des **fins d’évaluation technique**,
+- dans un **contexte pédagogique et démonstratif**.
+
+Toute réutilisation, diffusion ou exploitation à des fins commerciales ou en environnement de production est soumise à l’accord explicite de l’auteur.
+
+### Améliorations possibles
+Dans un contexte de développement à plus long terme, les axes d’amélioration suivants pourraient être envisagés :
+- ajout de tests unitaires et d’intégration (JUnit, Testcontainers),
+- gestion avancée des créneaux et des fuseaux horaires,
+- persistance sur une base de données externe (PostgreSQL/MySQL),
+- audit et renforcement de la sécurité,
+- amélioration de l’expérience utilisateur du calendrier de réservation.
 
 ## Table des matières
 
